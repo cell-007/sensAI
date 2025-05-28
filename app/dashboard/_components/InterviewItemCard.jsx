@@ -21,8 +21,8 @@ function InterviewItemCard({interview}) {
       
       <div className='flex justify-between mt-2 gap-5'>
         
-        <Button size="sm" variant="outline" className="w-40" onClick={onFeedbackPress}>Feedback</Button>
-        <Button size="sm" className="w-40" onClick={onStart}>Start</Button>
+        <Button size="sm" variant="outline" className="w-half" onClick={onFeedbackPress}>Feedback</Button>
+        <Button size="sm" className="w-half" onClick={onStart}>Start</Button>
       </div>
       
     </div>

@@ -15,7 +15,7 @@ function page() {
 
         <p className="mt-2 sm:mt-4">
           <strong className="text-3xl font-bold text-gray-900 sm:text-4xl"> 0$ </strong>
-          <span className="text-sm font-medium text-gray-700">/month</span>
+          <span className="text-sm font-medium text-gray-700">/Month</span>
            </p>
 
         <a
@@ -134,7 +134,7 @@ function page() {
         <p className="mt-2 sm:mt-4">
           <strong className="text-3xl font-bold text-gray-900 sm:text-4xl"> 9.99$ </strong>
 
-          <span className="text-sm font-medium text-gray-700">/month</span>
+          <span className="text-sm font-medium text-gray-700">/Month</span>
         </p>
 
         <a
@@ -254,7 +254,7 @@ function page() {
         <p className="mt-2 sm:mt-4">
           <strong className="text-3xl font-bold text-gray-900 sm:text-4xl"> 49.99$ </strong>
 
-          <span className="text-sm font-medium text-gray-700">/month</span>
+          <span className="text-sm font-medium text-gray-700">/Year</span>
         </p>
 
         <a

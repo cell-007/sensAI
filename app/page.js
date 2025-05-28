@@ -8,11 +8,11 @@ export default function Home() {
   const router = useRouter();
 
   const getStarted=()=>{
-        router.push('dashboard')
+        router.push('upgrade')
     }
 
     const start=()=>{
-        router.push('upgrade')
+        router.push('dashboard')
     }
 
   return (

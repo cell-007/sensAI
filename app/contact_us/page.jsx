@@ -7,12 +7,14 @@ import {
   Phone,
   MapPin,
   CheckCircle,
-  X
+  X,
+  AlertCircle
 } from "lucide-react";
 
 function Page() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showToast, setShowToast] = useState(false);
+  const [toastType, setToastType] = useState('success'); // 'success' or 'error'
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -31,29 +33,55 @@ function Page() {
   const handleSubmit = async () => {
     // Basic validation
     if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+      setToastType('error');
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 5000);
       return;
     }
     
     setIsSubmitting(true);
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    try {
+      // Replace 'YOUR_FORM_ID' with your actual Formspree form ID
+      const response = await fetch('https://formspree.io/f/xgvkgzkq', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          subject: formData.subject,
+          message: formData.message,
+        }),
+      });
 
-    setIsSubmitting(false);
-    setShowToast(true);
-    
-    // Reset form
-    setFormData({
-      name: '',
-      email: '',
-      subject: '',
-      message: ''
-    });
-
-    // Auto-hide toast after 5 seconds
-    setTimeout(() => {
-      setShowToast(false);
-    }, 5000);
+      if (response.ok) {
+        setToastType('success');
+        setShowToast(true);
+        
+        // Reset form
+        setFormData({
+          name: '',
+          email: '',
+          subject: '',
+          message: ''
+        });
+      } else {
+        throw new Error('Failed to send message');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      setToastType('error');
+      setShowToast(true);
+    } finally {
+      setIsSubmitting(false);
+      
+      // Auto-hide toast after 5 seconds
+      setTimeout(() => {
+        setShowToast(false);
+      }, 5000);
+    }
   };
 
   const closeToast = () => {
@@ -61,19 +89,27 @@ function Page() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-100 to-white mt-10 mb-10 rounded-lg relative">
+    <div className="min-h-screen bg-gradient-to-b from-blue-100 to-white mt-10 mb-20 rounded-lg relative">
       {/* Toast Notification */}
       {showToast && (
         <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-top-2 duration-300">
-          <div className="bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg flex items-center space-x-3 min-w-80">
-            <CheckCircle className="h-6 w-6 flex-shrink-0" />
+          <div className={`${toastType === 'success' ? 'bg-green-500' : 'bg-red-500'} text-white px-6 py-4 rounded-lg shadow-lg flex items-center space-x-3 min-w-80`}>
+            {toastType === 'success' ? (
+              <CheckCircle className="h-6 w-6 flex-shrink-0" />
+            ) : (
+              <AlertCircle className="h-6 w-6 flex-shrink-0" />
+            )}
             <div className="flex-1">
-              <p className="font-semibold">Message Sent Successfully!</p>
-              <p className="text-sm text-green-100">We'll get back to you soon.</p>
+              <p className="font-semibold">
+                {toastType === 'success' ? 'Message Sent Successfully!' : 'Error Sending Message'}
+              </p>
+              <p className={`text-sm ${toastType === 'success' ? 'text-green-100' : 'text-red-100'}`}>
+                {toastType === 'success' ? "We'll get back to you soon." : 'Please check all fields and try again.'}
+              </p>
             </div>
             <button 
               onClick={closeToast}
-              className="text-green-100 hover:text-white transition-colors"
+              className={`${toastType === 'success' ? 'text-green-100 hover:text-white' : 'text-red-100 hover:text-white'} transition-colors`}
             >
               <X className="h-5 w-5" />
             </button>
@@ -115,8 +151,8 @@ function Page() {
             <div className="p-6 bg-white rounded-2xl border border-gray-100 animate-in slide-in-from-left duration-700 delay-200 hover:shadow-lg transition-shadow">
               <MapPin className="h-12 w-12 text-blue-600 mb-4" />
               <h3 className="text-xl font-semibold mb-2">Visit Us</h3>
-              <p className="text-gray-600">123 Tech Valley Drive</p>
-              <p className="text-gray-600">San Francisco, CA 94107</p>
+              <p className="text-gray-600">Cyber City</p>
+              <p className="text-gray-600">Delhi NCR, India</p>
             </div>
           </div>
 
@@ -153,24 +189,6 @@ function Page() {
                   onChange={handleInputChange}
                   className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all hover:border-gray-300"
                   placeholder="Enter your email"
-                  required
-                  disabled={isSubmitting}
-                  suppressHydrationWarning={true}
-                />
-              </div>
-
-              <div className="animate-in fade-in duration-500 delay-500">
-                <label className="block text-gray-700 mb-2" htmlFor="subject">
-                  Subject
-                </label>
-                <input
-                  type="text"
-                  id="subject"
-                  name="subject"
-                  value={formData.subject}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all hover:border-gray-300"
-                  placeholder="Enter subject"
                   required
                   disabled={isSubmitting}
                   suppressHydrationWarning={true}

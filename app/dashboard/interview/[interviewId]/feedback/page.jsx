@@ -16,6 +16,7 @@ import { useRouter } from 'next/navigation'
 function Feedback({params}) {
     const resolvedParams = use(params); // Unwrap the params Promise
     const [feedbackList,setFeedbackList]=useState([]);
+    const [averageRating, setAverageRating] = useState(0);
     const router=useRouter();
     
     useEffect(()=>{
@@ -29,6 +30,17 @@ function Feedback({params}) {
         .orderBy(UserAnswer.id);
         console.log(result);
         setFeedbackList(result);
+        
+        // Calculate average rating
+        if(result.length > 0) {
+            const totalRating = result.reduce((sum, item) => {
+                // Parse rating from string format like "7/10" or just "7"
+                const rating = parseFloat(item.rating.toString().split('/')[0]);
+                return sum + (isNaN(rating) ? 0 : rating);
+            }, 0);
+            const avgRating = (totalRating / result.length).toFixed(1);
+            setAverageRating(avgRating);
+        }
     }
     
   return (
@@ -40,7 +52,7 @@ function Feedback({params}) {
       <h2 className='text-3xl font-bold text-green-500'>Congratulations!</h2>
       <h2 className='font-bold text-2xl'>Here is your Interview Feedback</h2>
 
-      <h2 className='text-blue-800 text-lg my-3'>Your Overall Interview Rating: <strong>6/10</strong></h2>
+      <h2 className='text-blue-800 text-lg my-3'>Your Overall Interview Rating: <strong>{averageRating}/10</strong></h2>
       <h2 className='text-sm text-gray-500 '>Find below Interview Question with correct answer, your answer and feedback for improvement</h2>
       {feedbackList&&feedbackList.map((item,index)=>(
         <Collapsible key={index} className='mt-7'>
@@ -58,7 +70,7 @@ function Feedback({params}) {
         </Collapsible>
       ))}
     </>}
-      <Button onClick={()=>router.replace('/dashboard')} className='w-full mt-10'>Go to Dashboard</Button>
+      <Button onClick={()=>router.replace('/dashboard')} className='w-fit mt-10'>Go to Dashboard</Button>
     </div>
   )
 }

@@ -1,6 +1,7 @@
 "use client"
 import React, { useState } from 'react';
-import { FaStar, FaRegCommentDots, FaChartLine, FaUserTie } from 'react-icons/fa';
+import { Star, MessageCircle, TrendingUp, User, Plus, X } from 'lucide-react';
+import { BiSolidShow } from "react-icons/bi";
 
 // Date formatting utility
 const formatDate = (dateString) => {
@@ -11,7 +12,7 @@ const formatDate = (dateString) => {
   return `${day}/${month}/${year}`;
 };
 
-const allReviews = [
+const initialReviews = [
   {
     id: 1,
     user: 'Emily Rodriguez',
@@ -80,34 +81,109 @@ const allReviews = [
   },
 ];
 
-function Page() {
+const interviewTypes = [
+  'Technical Interview',
+  'Behavioral Interview',
+  'Case Study Interview',
+  'Portfolio Review',
+  'Leadership Interview',
+  'Phone Screening',
+  'System Design',
+  'Culture Fit'
+];
 
+function Page() {
+  const [allReviews, setAllReviews] = useState(initialReviews);
   const [visibleReviews, setVisibleReviews] = useState(3);
+  const [showForm, setShowForm] = useState(false);
+  const [formData, setFormData] = useState({
+    user: '',
+    role: '',
+    rating: 5,
+    interviewType: 'Technical Interview',
+    metrics: { pacing: 80, clarity: 80, confidence: 80 },
+    comment: ''
+  });
 
   const loadMoreReviews = () => {
     setVisibleReviews(prev => prev + 3);
   };
 
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleMetricChange = (metric, value) => {
+    setFormData(prev => ({
+      ...prev,
+      metrics: {
+        ...prev.metrics,
+        [metric]: parseInt(value)
+      }
+    }));
+  };
+
+  const handleRatingClick = (rating) => {
+    setFormData(prev => ({
+      ...prev,
+      rating
+    }));
+  };
+
+  const handleSubmitReview = () => {
+    
+    if (!formData.user.trim() || !formData.role.trim() || !formData.comment.trim()) {
+      alert('Please fill in all required fields');
+      return;
+    }
+
+    const newReview = {
+      id: allReviews.length + 1,
+      ...formData,
+      date: new Date().toISOString().split('T')[0],
+      avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(formData.user)}&background=random`
+    };
+
+    setAllReviews(prev => [newReview, ...prev]);
+    setVisibleReviews(prev => Math.max(prev, 3));
+    
+    // Reset form
+    setFormData({
+      user: '',
+      role: '',
+      rating: 5,
+      interviewType: 'Technical Interview',
+      metrics: { pacing: 80, clarity: 80, confidence: 80 },
+      comment: ''
+    });
+    
+    setShowForm(false);
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 mt-5 mb-10 rounded-lg">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4 flex items-center justify-center gap-2">
-            <FaUserTie className="text-blue-600" /> Interview Success Stories
+            <User className="text-blue-600" /> Interview Success Stories
           </h1>
           <div className="flex flex-col items-center justify-center space-y-4">
             <div className="flex items-center space-x-6">
               <div className="flex items-center space-x-2 bg-white p-4 rounded-lg shadow">
-                <FaStar className="w-6 h-6 text-yellow-400" />
+                <Star className="w-6 h-6 text-yellow-400" />
                 <span className="text-2xl font-bold">4.9/5</span>
               </div>
               <div className="flex items-center space-x-2 bg-white p-4 rounded-lg shadow">
-                <FaRegCommentDots className="w-6 h-6 text-green-500" />
-                <span className="text-2xl font-bold">1.2k+</span>
-                <span className="text-gray-600">Mock Sessions</span>
+                <MessageCircle className="w-6 h-6 text-green-500" />
+                <span className="text-2xl font-bold">{allReviews.length}</span>
+                <span className="text-gray-600">Reviews</span>
               </div>
               <div className="flex items-center space-x-2 bg-white p-4 rounded-lg shadow">
-                <FaChartLine className="w-6 h-6 text-purple-500" />
+                <TrendingUp className="w-6 h-6 text-purple-500" />
                 <span className="text-2xl font-bold">87%</span>
                 <span className="text-gray-600">Success Rate</span>
               </div>
@@ -115,8 +191,159 @@ function Page() {
             <p className="text-gray-600 mt-4 max-w-2xl mx-auto">
               See how our AI-powered mock interviews have helped professionals improve their technical communication, behavioral responses, and interview confidence.
             </p>
+            
+            <button
+              onClick={() => setShowForm(true)}
+              className="mt-6 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors duration-300 font-medium flex items-center gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              Share Your Experience
+            </button>
           </div>
         </div>
+
+        {/* Review Form Modal */}
+        {showForm && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="p-6">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-bold text-gray-900">Share Your Review</h2>
+                  <button
+                    onClick={() => setShowForm(false)}
+                    className="text-gray-500 hover:text-gray-700"
+                  >
+                    <X className="w-6 h-6" />
+                  </button>
+                </div>
+                
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Your Name *
+                      </label>
+                      <input
+                        type="text"
+                        name="user"
+                        value={formData.user}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        required
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Your Role *
+                      </label>
+                      <input
+                        type="text"
+                        name="role"
+                        value={formData.role}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="e.g. Software Engineer, Product Manager"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Interview Type
+                    </label>
+                    <select
+                      name="interviewType"
+                      value={formData.interviewType}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      {interviewTypes.map(type => (
+                        <option key={type} value={type}>{type}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Overall Rating
+                    </label>
+                    <div className="flex gap-2">
+                      {[1, 2, 3, 4, 5].map(star => (
+                        <button
+                          key={star}
+                          type="button"
+                          onClick={() => handleRatingClick(star)}
+                          className="focus:outline-none"
+                        >
+                          <Star
+                            className={`w-8 h-8 ${star <= formData.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'} hover:text-yellow-400 transition-colors`}
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-4">
+                      Performance Metrics
+                    </label>
+                    <div className="grid grid-cols-3 gap-4">
+                      {Object.entries(formData.metrics).map(([metric, value]) => (
+                        <div key={metric}>
+                          <label className="block text-sm text-gray-600 mb-2 capitalize">
+                            {metric}: {value}%
+                          </label>
+                          <input
+                            type="range"
+                            min="0"
+                            max="100"
+                            value={value}
+                            onChange={(e) => handleMetricChange(metric, e.target.value)}
+                            className="w-full"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Your Review *
+                    </label>
+                    <textarea
+                      name="comment"
+                      value={formData.comment}
+                      onChange={handleInputChange}
+                      rows={4}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Share your experience with the mock interview platform..."
+                      required
+                    />
+                  </div>
+
+                  <div className="flex gap-4 justify-end">
+                    <button
+                      type="button"
+                      onClick={() => setShowForm(false)}
+                      className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleSubmitReview}
+                      className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      Submit Review
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {allReviews.slice(0, visibleReviews).map((review) => (
@@ -136,9 +363,9 @@ function Page() {
               <div className="mb-4 flex justify-between items-center">
                 <div className="flex items-center">
                   {[...Array(5)].map((_, i) => (
-                    <FaStar
+                    <Star
                       key={i}
-                      className={`w-5 h-5 ${i < review.rating ? 'text-yellow-400' : 'text-gray-300'}`}
+                      className={`w-5 h-5 ${i < review.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
                     />
                   ))}
                 </div>
@@ -176,8 +403,8 @@ function Page() {
               onClick={loadMoreReviews}
               className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors duration-300 font-medium flex items-center justify-center gap-2 mx-auto"
             >
-              <FaChartLine className="w-5 h-5" />
-              Load more Reviews
+              <BiSolidShow className="w-5 h-5" />
+              Show more Reviews
             </button>
           </div>
         )}
